@@ -38,6 +38,7 @@ const loginPaciente = async(req,res)=>{
         emailP,
         celular,
         convencional,
+        rol: "paciente",
         _id
     })
 }
@@ -70,9 +71,14 @@ const listarPacientes = async (req,res)=>{
     // Que sean solo los del paciente que inicie sesión
     // Quitar campos no necesarios 
     // Mostrar campos de documentos relacionados
-    const pacientes = await Paciente.find({estado:true}).where('veterinario').equals(req.veterinarioBDD).select("-salida -createdAt -updatedAt -__v").populate('veterinario','_id nombre apellido')
-    // Respuesta 
-    res.status(200).json(pacientes)
+    if (req.pacienteBDD && "propietario" in req.pacienteBDD) {
+        const pacientes = await Paciente.find(req.pacienteBDD._id).select("-salida -createdAt -updatedAt -__v").populate('veterinario','_id nombre apellido')
+        res.status(200).json(pacientes)
+    }
+    else{
+        const pacientes = await Paciente.find({estado:true}).where('veterinario').equals(req.veterinarioBDD).select("-salida -createdAt -updatedAt -__v").populate('veterinario','_id nombre apellido')
+        res.status(200).json(pacientes)
+    }
 }
 
 
@@ -174,10 +180,13 @@ const eliminarPaciente = async (req,res)=>{
     if( !mongoose.Types.ObjectId.isValid(id) ) return res.status(404).json({msg:`Lo sentimos, no existe el veterinario ${id}`})
 
     const {salida} = req.body
-
-    await Paciente.findByIdAndUpdate(req.params.id,{salida:Date.parse(salida),estado:false})
-    
-    res.status(200).json({msg:"Fecha de salida del paciente registrado exitosamente"})
+    console.log(salida)
+    try {
+        await Paciente.findByIdAndUpdate(req.params.id,{salida:Date.parse(salida),estado:false})
+        res.status(200).json({msg:"Fecha de salida del paciente registrado exitosamente"})
+    }catch (error) {
+        return res.status(400).json({msg:"Lo sentimos, no se pudo realizar la operación",error})
+    }
 }
 
 

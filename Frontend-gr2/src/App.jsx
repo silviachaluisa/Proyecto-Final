@@ -16,43 +16,51 @@ import { Confirmar } from "./paginas/Confirmar";
 import Restablecer from "./paginas/Restablecer";
 import { AuthProvider } from "./context/AuthProvider";
 import { PrivateRoute } from "./routes/PrivateRoutes";
+import PrivateRouteWithRole from "./routes/PrivateRouteWithRole";
+import { TratamientosProvider } from "./context/TratamientoProvider";
 
 function App() {
   return (
     <>
       <BrowserRouter>
         <AuthProvider>
-          {/* Proveedor del contexto */}
-          <Routes>
-            <Route index element={<LandinPage />} />
+          <TratamientosProvider>
+            {/* Proveedor del contexto */}
+            <Routes>
+              <Route index element={<LandinPage />} />
 
-            <Route path="/" element={<Auth />}>
-              <Route path="login" element={<Login />} />
-              <Route path="register" element={<Register />} />
-              <Route path="forgot/:id" element={<Forgot />} />
-              <Route path="confirmar/:token" element={<Confirmar />} />
-              <Route
-                path="recuperar-password/:token"
-                element={<Restablecer />}
-              />
-              <Route path="*" element={<NotFound />} />
-            </Route>
-            
-            <Route path="/dashboard/*" element={
-                <PrivateRoute>
-                    <Routes>
-                        <Route element={<Dashboard />}>
-                            <Route index element={<Perfil />} />
-                            <Route path="listar" element={<Listar />} />
-                            <Route path="visualizar/:id" element={<Visualizar />} />
-                            <Route path="crear" element={<Crear />} />
-                            <Route path="actualizar/:id" element={<Actualizar />} />
-                        </Route>
-                    </Routes>
-                </PrivateRoute>
-            }>
-            </Route>
-          </Routes>
+              <Route path="/" element={<Auth />}>
+                <Route path="login" element={<Login />} />
+                <Route path="register" element={<Register />} />
+                <Route path="forgot/:id" element={<Forgot />} />
+                <Route path="confirmar/:token" element={<Confirmar />} />
+                <Route
+                  path="recuperar-password/:token"
+                  element={<Restablecer />}
+                />
+                <Route path="*" element={<NotFound />} />
+              </Route>
+              
+              <Route path="/dashboard/*" element={
+                  <PrivateRoute>
+                      <Routes>
+                          <Route element={<Dashboard />}>
+                              <Route index element={<Perfil />} />
+                              <Route path="listar" element={<Listar />} />
+                              <Route path="visualizar/:id" element={<Visualizar />} />
+                              <Route path="crear" element={
+                                  <PrivateRouteWithRole>
+                                      <Crear />
+                                  </PrivateRouteWithRole>
+                              } />
+                              <Route path="actualizar/:id" element={<Actualizar />} />
+                          </Route>
+                      </Routes>
+                  </PrivateRoute>
+              }>
+              </Route>
+            </Routes>
+          </TratamientosProvider>
         </AuthProvider>
       </BrowserRouter>
     </>

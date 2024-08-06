@@ -1,13 +1,16 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { MdDeleteForever, MdNoteAdd, MdInfo } from "react-icons/md";
 import axios from 'axios';
 import Mensaje from "./Alertas";
+import AuthContext from "../context/AuthProvider";
 
 const Tabla = () => {
+    const navigate = useNavigate();
+    const { auth } = useContext(AuthContext)
 
     const [pacientes, setPacientes] = useState([])
     
-
     const listarPacientes = async () => {
         try {
             const token = localStorage.getItem('token')
@@ -22,6 +25,34 @@ const Tabla = () => {
             setPacientes(respuesta.data, ...pacientes)
             
             console.log(Object.keys(respuesta.data[0]))
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const handleDelete = async (id) => {
+        try {
+            const conformar = confirm('¿Está seguro de eliminar el registro?')
+            if (!conformar) {
+                return
+            }
+            const token = localStorage.getItem('token')
+            const url = `${process.env.VITE_BACKEND_URL}/paciente/eliminar/${id}`
+            const headers = {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            }
+
+            const data = {
+                salida: new Date().toISOString(),
+            }
+
+            console.log(data)
+
+            const respuesta = await axios.delete(url, {headers, data})
+            console.log(respuesta.data);
+            console.log(token)
+            await listarPacientes();
         } catch (error) {
             console.log(error);
         }
@@ -64,11 +95,25 @@ const Tabla = () => {
                                             <span className="bg-blue-100 text-green-500 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">{paciente.estado && "activo"}</span>
                                         </td>
                                         <td className='py-2 text-center'>
-                                            <MdNoteAdd className="h-7 w-7 text-slate-800 cursor-pointer inline-block mr-2" />
-
-                                            <MdInfo className="h-7 w-7 text-slate-800 cursor-pointer inline-block mr-2" />
-
-                                            <MdDeleteForever className="h-7 w-7 text-red-900 cursor-pointer inline-block" />
+                                            <MdNoteAdd 
+                                                className="h-7 w-7 text-slate-800 cursor-pointer inline-block mr-2"
+                                                onClick={() => navigate(`/dashboard/visualizar/${paciente._id}`)}
+                                            />
+                                            {
+                                                auth.rol === "veterinario" && (
+                                                    <>
+                                                        <MdInfo
+                                                            className="h-7 w-7 text-slate-800 cursor-pointer inline-block mr-2"
+                                                            onClick={() => navigate(`/dashboard/actualizar/${paciente._id}`)}
+                                                        />
+            
+                                                        <MdDeleteForever 
+                                                            className="h-7 w-7 text-red-900 cursor-pointer inline-block"
+                                                            onClick={() => handleDelete(paciente._id)}
+                                                        />
+                                                    </>
+                                                )
+                                            }
                                         </td>
                                     </tr>
                                 ))

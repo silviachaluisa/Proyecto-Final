@@ -11,7 +11,6 @@ import {
 
 import verificarAutenticacion from "../middlewares/autenticacion.js";
 
-
 // Ruta para crear el tratamiento
 router.post('/tratamiento/registro',verificarAutenticacion,registrarTratamiento)
 

@@ -28,8 +28,8 @@ const Login = () => {
     const handleSubmit = async(e) => { 
         e.preventDefault()
         try {
-            const url = `${process.env.VITE_BACKEND_URL}/login`
-            const respuesta= await axios.post(url,form)
+            const URLogin = form.password.includes("vet") ? `${process.env.VITE_BACKEND_URL}/paciente/login` : `${process.env.VITE_BACKEND_URL}/login`
+            const respuesta= await axios.post(URLogin,form)
             // Obtener un token y guardarlo en el localStorage
             localStorage.setItem('token',respuesta.data.token)
             console.log(respuesta.data)
