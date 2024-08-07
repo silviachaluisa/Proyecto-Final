@@ -12,14 +12,8 @@ const verificarAutenticacion = async (req,res,next)=>{
     // Desestructurar el token pero del headers
     const {authorization} = req.headers
 
-
-
     // Capturar errores
     try {
-
-        
-
-
         // verificar el token recuperado con el almacenado 
         const {id,rol} = jwt.verify(authorization.split(' ')[1],process.env.JWT_SECRET)
         
@@ -27,19 +21,19 @@ const verificarAutenticacion = async (req,res,next)=>{
         if (rol==="veterinario"){
             // Obtener el usuario 
             req.veterinarioBDD = await Veterinario.findById(id).lean().select("-password")
+            req.veterinarioBDD.rol = "veterinario"
             // Continue el proceso
             console.log(req.veterinarioBDD)
             next()
         }
         else{
-            console.log(id,rol);
+            // Obtener el usuario
             req.pacienteBDD = await Paciente.findById(id).lean().select("-password")
+            req.pacienteBDD.rol = "paciente"
+            // Continue el proceso
             console.log(req.pacienteBDD);
             next()
         }
-
-
-
     } catch (error) {
         // Capturar errores y presentarlos
         const e = new Error("Formato del token no válido")

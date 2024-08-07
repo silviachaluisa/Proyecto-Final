@@ -2,16 +2,10 @@
 import Paciente from "../models/Paciente.js"
 import Tratamiento from "../models/Tratamiento.js"
 
-
 // IMPORTAR EL MÉTODO sendMailToPaciente
 import { sendMailToPaciente } from "../config/nodemailer.js"
-
-
 import mongoose from "mongoose"
 import generarJWT from "../helpers/crearJWT.js"
-
-
-
 
 // Método para el proceso de login
 const loginPaciente = async(req,res)=>{
@@ -43,10 +37,6 @@ const loginPaciente = async(req,res)=>{
     })
 }
 
-
-
-
-
 // Método para ver el perfil 
 const perfilPaciente =(req,res)=>{
     delete req.pacienteBDD.ingreso
@@ -59,11 +49,6 @@ const perfilPaciente =(req,res)=>{
     delete req.pacienteBDD.__v
     res.status(200).json(req.pacienteBDD)
 }
-
-
-
-
-
 
 // Método para listar todos los pacientes
 const listarPacientes = async (req,res)=>{
@@ -81,8 +66,6 @@ const listarPacientes = async (req,res)=>{
     }
 }
 
-
-
 // Método para ver el detalle de un paciente en particular
 const detallePaciente = async(req,res)=>{
     const {id} = req.params
@@ -95,52 +78,35 @@ const detallePaciente = async(req,res)=>{
     })
 }
 
-
-
-
-
-
 // Método para registrar un paciente
 const registrarPaciente = async(req,res)=>{
 
     // desestructurar el email
     const {email} = req.body
 
-
     //  Validar todos los camposs
     if (Object.values(req.body).includes("")) return res.status(400).json({msg:"Lo sentimos, debes llenar todos los campos"})
-    
     
     // Obtener el usuario en base al email
     const verificarEmailBDD = await Paciente.findOne({email})
 
-
     // Verificar si el paciente ya se encuentra registrado
     if(verificarEmailBDD) return res.status(400).json({msg:"Lo sentimos, el email ya se encuentra registrado"})
-
-
-
-    
 
     // Crear una instancia del Paciente
     const nuevoPaciente = new Paciente(req.body)
 
-
     // Crear un password
     const password = Math.random().toString(36).slice(2)
-
 
     // Encriptar el password
     nuevoPaciente.password = await nuevoPaciente.encrypPassword("vet"+password)
 
-
     // Enviar el correo electrónico
     await sendMailToPaciente(email,"vet"+password)
 
-
     // Asociar el paciente con el veterinario
     nuevoPaciente.veterinario=req.veterinarioBDD._id
-
 
     // Guardar en BDD
     await nuevoPaciente.save()
@@ -148,9 +114,6 @@ const registrarPaciente = async(req,res)=>{
     // Presentar resultados
     res.status(200).json({msg:"Registro exitoso del paciente y correo enviado"})
 }
-
-
-
 
 // Método para actualizar un paciente
 const actualizarPaciente = async(req,res)=>{
@@ -164,12 +127,6 @@ const actualizarPaciente = async(req,res)=>{
 
     res.status(200).json({msg:"Actualización exitosa del paciente"})
 }
-
-
-
-
-
-
 
 // Método para eliminar(dar de baja) un paciente
 const eliminarPaciente = async (req,res)=>{
@@ -188,11 +145,6 @@ const eliminarPaciente = async (req,res)=>{
         return res.status(400).json({msg:"Lo sentimos, no se pudo realizar la operación",error})
     }
 }
-
-
-
-
-
 
 export {
 		loginPaciente,

@@ -23,8 +23,6 @@ const Tabla = () => {
             }
             const respuesta = await axios.get(url, options)
             setPacientes(respuesta.data, ...pacientes)
-            
-            console.log(Object.keys(respuesta.data[0]))
         } catch (error) {
             console.log(error);
         }
@@ -47,11 +45,7 @@ const Tabla = () => {
                 salida: new Date().toISOString(),
             }
 
-            console.log(data)
-
             const respuesta = await axios.delete(url, {headers, data})
-            console.log(respuesta.data);
-            console.log(token)
             await listarPacientes();
         } catch (error) {
             console.log(error);
