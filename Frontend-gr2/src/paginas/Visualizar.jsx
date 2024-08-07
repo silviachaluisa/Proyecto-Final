@@ -10,7 +10,7 @@ import TablaTratamientos from '../componets/TablaTratamientos';
 const Visualizar = () => {
     const { id } = useParams()
     const { auth } = useContext(AuthContext)
-    const {modal, handleModal, tratamientos, setTratamientos} = useContext(TratamientosContext);
+    const {modal, handleModal, tratamientos, setTratamientos, tratamientoID} = useContext(TratamientosContext);
 
     const [paciente, setPaciente] = useState({})
     const [mensaje, setMensaje] = useState({})
@@ -107,14 +107,14 @@ const Visualizar = () => {
                                 className="sm:w-auto leading-3 text-center text-white px-6 py-4 rounded-lg bg-blue-700 hover:bg-blue-900" 
                                 onClick={handleModal}
                             >Registrar</button>
-                            
                         </>
                     )
                 }
                 {
-                    modal && <ModalTratamiento idPaciente={paciente?._id}/>
+                    modal && tratamientoID === null && (
+                        <ModalTratamiento idPaciente={paciente?._id} actualizar={false} />
+                    )
                 }
-
                 {
                     tratamientos.length == 0 ? 
                     <Mensaje tipo={"Active"}>{"No existen registros"}</Mensaje>

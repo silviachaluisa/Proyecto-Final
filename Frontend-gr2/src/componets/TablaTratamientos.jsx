@@ -1,13 +1,22 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { MdDeleteForever, MdOutlineSecurityUpdateGood, MdPublishedWithChanges } from "react-icons/md";
 import TratamientosContext from "../context/TratamientoProvider";
 import AuthContext from "../context/AuthProvider";
+import ModalTratamiento from "./Modals/ModalTratamiento";
 
 const TablaTratamientos = ({tratamientos}) => {
-    const { handleDelete, handleState } = useContext(TratamientosContext);
+    const { handleDelete, handleState, modal, handleModal, tratamientoID, setTatamientoID } = useContext(TratamientosContext);
+    
     const { auth } = useContext(AuthContext);
     console.log(tratamientos)
+
+    const handleUpdate = (id) => {
+        setTatamientoID(id);
+        handleModal();
+    }
+
     return (
+        <>
         <table className='w-full mt-5 table-auto shadow-lg  bg-white'>
             <thead className='bg-gray-800 text-slate-400'>
                 <tr>
@@ -34,7 +43,10 @@ const TablaTratamientos = ({tratamientos}) => {
                             {
                                 auth.rol === "veterinario" && (
                                     <>
-                                        <MdPublishedWithChanges className="h-7 w-7 text-slate-800 cursor-pointer inline-block mr-2"/>
+                                        <MdPublishedWithChanges 
+                                            className="h-7 w-7 text-slate-800 cursor-pointer inline-block mr-2"
+                                            onClick={() => handleUpdate(tratamiento._id)}
+                                        />
                             
                                         <MdOutlineSecurityUpdateGood 
                                             className="h-7 w-7 text-slate-800 cursor-pointer inline-block mr-2"
@@ -55,7 +67,12 @@ const TablaTratamientos = ({tratamientos}) => {
 
             </tbody>
         </table>
-
+        {
+            modal && tratamientoID && (
+                <ModalTratamiento idPaciente={tratamientoID} actualizar={true} />
+            )
+        }
+        </>
     )
 }
 

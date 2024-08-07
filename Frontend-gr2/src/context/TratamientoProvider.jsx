@@ -8,6 +8,7 @@ const TratamientosContext = createContext()
 const TratamientosProvider = ({ children }) => {
     const [modal, setModal] = useState(false)
     const [tratamientos, setTratamientos] = useState([])
+    const [tratamientoID, setTatamientoID] = useState(null);
 
     const handleModal = () => {
         setModal(!modal);
@@ -25,6 +26,26 @@ const TratamientosProvider = ({ children }) => {
             }
             const respuesta = await axios.post(url, data, options);
             setTratamientos([respuesta.data.tratamiento, ...tratamientos]);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const handleUpdate = async (id, newData) => {
+        try {
+            const token = localStorage.getItem('token')
+            const url = `${process.env.VITE_BACKEND_URL}/tratamiento/${id}`
+            const urlP = `${process.env.VITE_BACKEND_URL}/paciente/${newData.paciente}`
+            const options = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                }
+            }
+            await axios.put(url, newData, options);
+            const respuesta = await axios.get(urlP, options)
+            console.warn("Tratamientos", respuesta.data.tratamientos)
+            setTratamientos(respuesta.data.tratamientos)
         } catch (error) {
             console.log(error);
         }
@@ -86,7 +107,10 @@ const TratamientosProvider = ({ children }) => {
                 setTratamientos,
                 handleRegister,
                 handleDelete,
-                handleState
+                handleState,
+                handleUpdate,
+                tratamientoID,
+                setTatamientoID
             }
         }>
             {children}
